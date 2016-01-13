@@ -6,7 +6,8 @@ https://github.com/bcmackintosh/bk-string
 
 Usage:
 
-# Import the library, currently expects the "libbkstring.so"
+# Import the library, currently expects the "libbkstring.so" to be at
+# "./deps/libbkstring.so" and "bkstring.py" to be at "./bkstring.py."
 import bkstring
 
 # Initialize
@@ -16,11 +17,12 @@ b = bkstring.bk_tree()
 b.add("foo")
 
 # Add a list of words
-ls = list("foo", "bar")
-b.add_list(ls)
+arr = list("foo", "bar")
+b.add_list(arr)
 
 # Search
-ls = b.search
+ls = b.search("foo", 1)
+assert()
 
 # Close the BK tree
 b.close()

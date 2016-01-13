@@ -30,11 +30,13 @@ https://github.com/bcmackintosh/bk-string
     ls = b.search("foo", 1)
     assert(ls[0] == "foo")
 
-# Close the BK tree
+## Close the BK tree
 
     b.close()
 
-# Example usage all together now
+*If you fail to close the BK Tree the module will segfault after execution.*
+
+## Example usage all together now
 
     import bkstring
 
