@@ -26,6 +26,8 @@ assert()
 
 # Close the BK tree
 b.close()
+
+If you fail to close the BK Tree the module will segfault after execution.
 """
 # TODO: Create a Setup.py with:
 #       Export of this module
@@ -36,11 +38,10 @@ from itertools import takewhile
 
 class BKNODE(Structure):
     pass
-class BKNODE(Structure):
-    BKNODE._fields_ = [("word", c_wchar_p),
+BKNODE._fields_ = [("word", c_wchar_p),
     ("child", POINTER(BKNODE)),
-    ("empty", c_int),
-    ("size", c_int)]
+    ("empty", c_uint64),
+    ("size", c_uint64)]
 
 class BKTREE(Structure):
     _fields_ = [("_root", BKNODE)]
@@ -54,6 +55,7 @@ class bk_tree(object):
     _clear_bktree = bkstring.clear_bktree
     _init = bkstring.init
     _close = bkstring.close
+    _free_list = bkstring.free_list
 
     def __init__(self):
         self.tree = BKTREE(BKNODE())
@@ -68,17 +70,23 @@ class bk_tree(object):
 
     def search(self, word, dist):
         # TODO: See if there's a less hacky way to handle the uint8_t** returned from "_search()"
-        ls = takewhile(lambda x: x is not None, cast(self._search(c_char_p(word), c_uint64(dist), byref(self.tree)), POINTER(c_char_p)))
-        ret = list()
+        ls = cast(self._search(
+                c_char_p(word),
+                c_uint64(dist),
+                byref(self.tree)),
+            POINTER(c_char_p))
 
-        for i in ls:
-            ret.append(i)
+        iter_ls = takewhile(lambda x: x is not None, ls)
 
-        return ret
+        arr = list()
+
+        for i in iter_ls:
+            arr.append(i)
+
+        # Get rid of the crazy ctypes pointer list, so we return a reasonable python one.
+        self._free_list(ls)
+
+        return arr
 
     def close(self):
-        # TODO: Actually make "_clear_bktree()" work as expected.  Not a huge deal because exiting bkstring should free memory allocations,
-        # but, still worth looking into.
-
-        # self._clear_bktree(self.tree)
-        self._close()
+        self._clear_bktree(self.tree)

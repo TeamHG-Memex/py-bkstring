@@ -20,4 +20,6 @@ ls = b.search("bar", 1)
 
 assert(len(ls) == 2)
 
+print "tests OK!"
+
 b.close()
