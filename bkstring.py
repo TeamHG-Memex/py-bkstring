@@ -41,10 +41,16 @@ class BKNODE(Structure):
 BKNODE._fields_ = [("word", c_wchar_p),
     ("child", POINTER(BKNODE)),
     ("empty", c_uint64),
-    ("size", c_uint64)]
+    ("size", c_uint64),
+    ("AddChild", CFUNCTYPE(c_char_p, POINTER(BKNODE)))]
+
 
 class BKTREE(Structure):
-    _fields_ = [("_root", BKNODE)]
+    pass
+BKTREE._fields_ = [("_root", BKNODE),
+    ("Add", CFUNCTYPE(c_char_p, POINTER(BKTREE))),
+    ("Search", CFUNCTYPE(c_char_p, c_uint64, POINTER(BKTREE))),
+    ("Dist", CFUNCTYPE(c_char_p, c_char_p))]
 
 class bk_tree(object):
     # Import the BK String shared library
@@ -89,4 +95,4 @@ class bk_tree(object):
         return arr
 
     def close(self):
-        self._clear_bktree(self.tree)
+        self._clear_bktree(byref(self.tree))
