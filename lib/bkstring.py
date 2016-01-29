@@ -29,12 +29,10 @@ b.close()
 
 If you fail to close the BK Tree the module will segfault after execution.
 """
-# TODO: Create a Setup.py with:
-#       Export of this module
-#       Handling the "libbkstring.so" shared library
 
 from ctypes import *
 from itertools import takewhile
+import os
 
 class BKNODE(Structure):
     pass
@@ -54,7 +52,8 @@ BKTREE._fields_ = [("_root", BKNODE),
 
 class bk_tree(object):
     # Import the BK String shared library
-    bkstring = CDLL("./deps/libbkstring.so")
+    dll_loc = os.path.join(os.path.dirname(__file__), 'shared/libbkstring.so')
+    bkstring = CDLL(dll_loc)
 
     _bk_add = bkstring.bk_add
     _search = bkstring.search
