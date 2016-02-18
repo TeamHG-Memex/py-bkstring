@@ -1,6 +1,6 @@
 from sys import argv
 
-import bkstring
+from bkstring import bkstring
 import time
 
 def benchmark(filename, word, dist):
