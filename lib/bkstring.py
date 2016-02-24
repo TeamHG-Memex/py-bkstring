@@ -50,24 +50,37 @@ BKTREE._fields_ = [("_root", BKNODE),
     ("Search", CFUNCTYPE(c_char_p, c_uint64, POINTER(BKTREE))),
     ("Dist", CFUNCTYPE(c_char_p, c_char_p))]
 
-class bk_tree(object):
+class BkTree():
     # Import the BK String shared library
     dll_loc = os.path.join(os.path.dirname(__file__), 'shared/libbkstring.so')
     bkstring = CDLL(dll_loc)
 
     _bk_add = bkstring.bk_add
+    _init = bkstring.init
     _search = bkstring.search
     _clear_bktree = bkstring.clear_bktree
-    _init = bkstring.init
-    _close = bkstring.close
     _free_list = bkstring.free_list
+    _l_dist = bkstring.l_dist
+    _mod_j_dist = bkstring.mod_j_dist
 
-    def __init__(self):
+    def __init__(self, fn='l_dist'):
+
+        self.word = ''
+
+        dist_fn = self._l_dist
+
+        if fn == 'mod_j_dist':
+            dist_fn = self._mod_j_dist
+
         self.tree = BKTREE(BKNODE())
-        self._init(byref(self.tree))
+        self._init(byref(self.tree), dist_fn)
+
+    def convert_word(self, word):
+        return c_char_p(word.encode('utf-8'))
 
     def add(self, word):
-        self._bk_add(c_char_p(word), byref(self.tree))
+        self._bk_add(self.convert_word(word), byref(self.tree))
+        self.word = word
 
     def add_list(self, ls):
         for i in ls:
@@ -76,22 +89,22 @@ class bk_tree(object):
     def search(self, word, dist):
         # TODO: See if there's a less hacky way to handle the uint8_t** returned from "_search()"
         ls = cast(self._search(
-                c_char_p(word),
+                self.convert_word(word),
                 c_uint64(dist),
                 byref(self.tree)),
             POINTER(c_char_p))
 
         iter_ls = takewhile(lambda x: x is not None, ls)
 
-        arr = list()
+        ret = list()
 
         for i in iter_ls:
-            arr.append(i)
+            ret.append(i.decode('utf-8'))
 
         # Get rid of the crazy ctypes pointer list, so we return a reasonable python one.
         self._free_list(ls)
 
-        return arr
+        return ret
 
     def close(self):
         self._clear_bktree(byref(self.tree))
