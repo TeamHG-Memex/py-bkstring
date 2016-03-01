@@ -1,4 +1,4 @@
-from lib import bkstring
+from bkstring.bktree import BkTree
 
 class BkGraph():
     def __init__(self, fn='l_dist'):
@@ -11,7 +11,7 @@ class BkGraph():
         try:
             self.trees[length].add(word)
         except KeyError:
-            self.trees[length] = bkstring.BkTree(self.fn)
+            self.trees[length] = BkTree(self.fn)
             self.trees[length].add(word)
 
     def add_list(self, arr):
@@ -22,7 +22,7 @@ class BkGraph():
         results = list()
 
         for idx, key in enumerate(self.trees):
-            diff = self._get_diff(word, key, dist)
+            diff = self.__get_diff(word, key, dist)
             results.extend(self.trees[key].search(word, diff))
 
         return list(set(results))
@@ -31,7 +31,7 @@ class BkGraph():
         for idx, key in enumerate(self.trees):
             self.trees[key].close()
 
-    def _get_diff(self, word, key, dist):
+    def __get_diff(self, word, key, dist):
         length = len(word)
 
         if self.fn == 'l_dist':

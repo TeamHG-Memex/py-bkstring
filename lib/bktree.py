@@ -87,7 +87,7 @@ class BkTree():
             self.add(i)
 
     def search(self, word, dist):
-        # TODO: See if there's a less hacky way to handle the uint8_t** returned from "_search()"
+        # TODO:30 See if there's a less hacky way to handle the uint8_t** returned from "_search()"
         ls = cast(self._search(
                 self.convert_word(word),
                 c_uint64(dist),
