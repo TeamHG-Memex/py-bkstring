@@ -2,15 +2,28 @@ from bkstring.bkgraph import BkGraph
 from bkstring.bktree import BkTree
 from bkstring.username import Username
 from bkstring.compare import *
+from bkstring.namesplitter import NameSplitter
 
 class UserSet():
     """A set of usernames to use for suggesting similar names."""
-    def __init__(self, skip_len=3):
+    def __init__(self, skip_len=3, training_list=None):
         self.__skip_len = skip_len
         self.__alphas = dict()
         self.__parts = dict()
         self.__alpha_graph = BkGraph()
         self.__word_tree = BkTree()
+        self.__name_splitter = self.__name_splitter(training_list)
+
+    def add_list(self, userlist):
+        # TODO: Add tuning to __name_splitter to match on large new sets of names.
+        for name in userlist:
+            self.__add(name)
+
+    def __name_splitter(self, training_list):
+        if training_list:
+            return NameSplitter(model_filename=training_list)
+
+        return NameSplitter()
 
     def add(self, username):
         # TODO:0 (C lower) Handle lowercase comparison in C library, and don't just pass it here.
@@ -24,7 +37,7 @@ class UserSet():
                 self.__alphas[name.alpha] = list([raw])
                 self.__alpha_graph.add(name.alpha)
 
-            for part in name.dissected:
+            for part in name.dissect(splitter=self.__name_splitter.dissect):
                 # Skip parts which are too short to create a reasonable correlation.
                 if len(part) <= self.__skip_len:
                     continue
@@ -35,15 +48,17 @@ class UserSet():
                     self.__parts[part] = list([raw])
                     self.__word_tree = BkTree()
 
+
     def refine(self, query, name_part, graph, dictionary):
         """Returns all names contained in the given graph/dictionary pair which are similar to a given query."""
-        # TODO: Check out a ML approach for filtering names.
-        score = 0
+        # After research with a ML based matching approach for usernames, this whole implementation will be replaced with the
+        # ML based approach.
         results = list()
 
         # Loop through each search result from the given graph:
         for part in graph.search(name_part, 1):
             for name in dictionary[part]:
+                score = 0
                 comp = Username(name)
                 min_len = min(len(query.raw), len(comp.raw))
                 overlap_min = (min_len - 1) / min_len
@@ -113,7 +128,7 @@ class UserSet():
                     score += 1
 
                 # Only add names to results if they have a high enough score.
-                if score > 5:
+                if score > 4:
                     results.append(comp.raw)
 
         return results
@@ -134,11 +149,13 @@ class UserSet():
             return
 
         results = list()
-        for part in query_name.dissected:
+        for part in query_name.dissect(self.__name_splitter.dissect):
             if len(part) <= self.__skip_len:
                 continue
 
+            # Search the word BK Tree for similar usernames
             results.extend(self.refine(query_name, part, self.__word_tree, self.__parts))
+            # Search the alphabet BK Tree graph for similar usernames
             results.extend(self.refine(query_name, part, self.__alpha_graph, self.__alphas))
 
         results = list(set(results))
