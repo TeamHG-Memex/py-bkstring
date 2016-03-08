@@ -18,10 +18,18 @@ class BkGraph():
         for word in arr:
             self.add(word)
 
-    def search(self, word, dist=0):
+    def search(self, word, dist, variance=None):
         results = list()
+        length = len(word)
 
         for idx, key in enumerate(self.trees):
+            if variance is not None and length - variance > length - abs(key - length):
+                # If the variance from this key is less than the allowable variance, skip this word.
+                continue
+            if variance is not None and length + variance < length + abs(key - length):
+                # If the variance from this key is greater than the allowable variance, skip this word.
+                continue
+
             diff = self.__get_diff(word, key, dist)
             results.extend(self.trees[key].search(word, diff))
 
