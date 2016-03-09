@@ -61,13 +61,14 @@ class BkTree():
     _clear_bktree = bkstring.clear_bktree
     _free_list = bkstring.free_list
     _l_dist = bkstring.l_dist
+    _hex_ham_dist = bkstring.hex_ham_dist
     _mod_j_dist = bkstring.mod_j_dist
 
     def __init__(self, fn='l_dist'):
-
-        self.word = ''
-
         dist_fn = self._l_dist
+
+        if fn == 'hex_ham_dist':
+            dist_fn = self._hex_ham_dist
 
         if fn == 'mod_j_dist':
             dist_fn = self._mod_j_dist
@@ -80,7 +81,6 @@ class BkTree():
 
     def add(self, word):
         self._bk_add(self.convert_word(word), byref(self.tree))
-        self.word = word
 
     def add_list(self, ls):
         for i in ls:
