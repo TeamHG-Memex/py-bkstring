@@ -8,13 +8,14 @@ https://github.com/bcmackintosh/bk-string
 
 ## Import the library
 
-    import bkstring
+    from bkstring.bktree import BkTree
+    from bkstring.bkgraph import BkGraph
 
 *Note: This import expects py-bkstring's file structure, that has the shared library located at ./deps/libbkstring.so and the python module at ./bkstring.py*
 
 ## Initialize
 
-    b = bkstring.bk_tree()
+    b = BkTree()
 
 ## Add words
 
