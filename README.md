@@ -38,17 +38,23 @@ Unfortunately for the time being, distance functions are limited to those implem
 ### Implemented distance functions
 * Levenshtein Distance: Edit distance based on replacements, deletions and insertions
 * Modified Jaccard Distance: This matches character intersection and union sets based on the character, and number of times it occurs.  For example, the modified union of "johndoe" and "jdoe" would be "johndoe," while the unmodified union would be "johnde."
-
-*Coming Soon: A hash hamming distance function for hex strings.*
+* Hex Hamming Distance: This checks the hamming distance of two hex strings, using XOR of binary values of the characters at each position in the strings.  Expects strings to be any length and contain only characters which represent valid hex values.  This includes '0-9', 'a-f', and 'A-F' characters.
 
 ### Setting the distance function on the BK Tree
 
 ```python
-# Levenshtein Distance (default)
+# Levenshtein Distance:
+# If an invalid or no 'fn' is defined, Levenshtein Distance will be used as default.
 b = BkTree(fn='l_dist')
 
-# Modified Jaccard Distance
+# Modified Jaccard Distance:
 b = BkTree(fn='mod_j_dist')
+
+# Hex Hamming Distance:
+# Example valid string would be '678afad98ffad6c5bb' or 'FD789C7CBB783452435'
+# Invalid example string would be 'cv67zx890ewrq890h' or 'VDSUH9F8.=FJ4V89N-J'
+b = BkTree(fn='hex_ham_dist')
+
 ```
 *If "fn" is set to any other string, it will default to Levenshtein Distance.*
 
