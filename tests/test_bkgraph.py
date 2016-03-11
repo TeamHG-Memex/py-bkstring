@@ -25,7 +25,7 @@ def test_jdist_bkgraph():
     graph.add('food')
     graph.add('bar')
 
-    ls = graph.search('btar')
+    ls = graph.search('btar', 0)
 
     assert('bar' in ls)
 

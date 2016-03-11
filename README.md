@@ -4,49 +4,104 @@ A python wrapper for the BK String C project.
 That project can be found at:
 https://github.com/bcmackintosh/bk-string
 
-# Usage
+# BK Tree Usage
 
-## Import the library
+## Code Example
+```python
+# Create a BK Tree
+from bkstring.bktree import BkTree
 
-    from bkstring.bktree import BkTree
-    from bkstring.bkgraph import BkGraph
+# By Default this uses Levenshtein Distance to map strings into the tree
+b = BkTree()
 
-*Note: This import expects py-bkstring's file structure, that has the shared library located at ./deps/libbkstring.so and the python module at ./bkstring.py*
+# Add strings
 
-## Initialize
+b.add('foo')
 
-    b = BkTree()
+# Add a list of words
 
-## Add words
+b.add_list(['foo', 'bar'])
 
-    b.add("foo")
+# Search
 
-## Add a list of words
+ls = b.search('foo', 1)
+assert('foo' in ls)
 
-    arr = list(["foo", "bar"])
-    b.add_list(arr)
+# Close the BK tree
 
-## Search
+b.close()
+```
 
-    ls = b.search("foo", 1)
-    assert(ls[0] == "foo")
+## Using other distance functions
+Unfortunately for the time being, distance functions are limited to those implemented in the C library.  
 
-## Close the BK tree
+### Implemented distance functions
+* Levenshtein Distance: Edit distance based on replacements, deletions and insertions
+* Modified Jaccard Distance: This matches character intersection and union sets based on the character, and number of times it occurs.  For example, the modified union of "johndoe" and "jdoe" would be "johndoe," while the unmodified union would be "johnde."
 
-    b.close()
+*Coming Soon: A hash hamming distance function for hex strings.*
 
-*If you fail to close the BK Tree the module will segfault after execution.*
+### Setting the distance function on the BK Tree
 
-## Example usage all together now
+```python
+# Levenshtein Distance (default)
+b = BkTree(fn='l_dist')
 
-    import bkstring
+# Modified Jaccard Distance
+b = BkTree(fn='mod_j_dist')
+```
+*If "fn" is set to any other string, it will default to Levenshtein Distance.*
 
-    b = bkstring.bk_tree()
-    b.add("foo")
-    arr = list(["bar", "baz"])
-    ls = b.search("bar", 1)
+# BK Graph Usage
+A "BK Graph" is a made up structure which dynamically sets distances based on string lengths, so that the difference in string lengths are ignored.  An example would be, "johndoe" and "jdoe" have edit distance 0, while "johndoe" and "jdoa" have edit distance 1.
 
-    for i in ls:
-        print i # bar, baz
+## Code Example
+BK Graph is almost identical usage as the BK Tree class, with a couple extra capabilities.
 
-    b.close()
+```python
+# Create the BK Graph
+from bkstring.bkgraph import BkGraph()
+
+# This defaults to using Levenshtein Distance as the distance function.
+g = BkGraph()
+
+# Create a BK Graph with a different distance function
+
+g = BkGraph(fn='mod_j_dist')
+g = BkGraph(fn='l_dist')
+
+# Add strings
+g.add('foo')
+
+# Add a list of strings
+g.add_list(['foo', 'bar', 'baz'])
+
+# Search for strings
+ls = g.search('food', 0)
+
+assert('foo' in ls)
+
+# Shut it down
+g.close()
+```
+
+## Variance
+Since the BK Graph uses a dynamic distance based on string length difference, we can also set what we want our variance of string length difference to be.  For example if we have:
+
+    g.add_list(['foo', 'bar', 'barkingmadcat'])
+
+We may want to search for strings matching the query string's length, but having a large edit distance.  For instance:
+
+```python
+ls = g.search('foo', 3, variance=0)
+ls == ['foo', 'bar']
+```
+
+Similarly we may want to search for only strings which have 0 edit distance, but may be longer or shorter:
+
+```python
+ls = g.search('bar', 0, variance=3)
+ls == ['bar']
+```
+
+By default variance is `None`, which allows the `BkGraph` to search for any length difference using the dynamic edit distance.
