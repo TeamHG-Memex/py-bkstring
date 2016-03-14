@@ -60,18 +60,18 @@ class BkTree():
     _search = bkstring.search
     _clear_bktree = bkstring.clear_bktree
     _free_list = bkstring.free_list
+    _l_dist = bkstring.l_dist
+    _hex_ham_dist = bkstring.hex_ham_dist
+    _mod_j_dist = bkstring.mod_j_dist
 
     def __init__(self, fn='l_dist'):
-        dist_fn = self.bkstring.l_dist
-
-        if fn == 'jaro_dist':
-            dist_fn = self.bkstring.jaro_dist
+        dist_fn = self._l_dist
 
         if fn == 'hex_ham_dist':
-            dist_fn = self.bkstring.hex_ham_dist
+            dist_fn = self._hex_ham_dist
 
         if fn == 'mod_j_dist':
-            dist_fn = self.bkstring.mod_j_dist
+            dist_fn = self._mod_j_dist
 
         self.tree = BKTREE(BKNODE())
         self._init(byref(self.tree), dist_fn)

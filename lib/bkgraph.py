@@ -5,10 +5,6 @@ class BkGraph():
         self.fn = fn
         self.trees = dict()
 
-        if fn == 'hex_ham_dist':
-            # TODO: Implement hex_ham_dist into BkGraph, needs a way to measure 'len()'
-            raise NotImplementedError('\'hex_ham_dist\' has not been implemented in Bk Graph.')
-
     def add(self, word):
         length = len(word)
 
@@ -54,5 +50,3 @@ class BkGraph():
             second = min(length, key)
 
             return min(100 - int(100 * (second - dist) / (first + dist)), 100)
-
-        return dist
