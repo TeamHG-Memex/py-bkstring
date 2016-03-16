@@ -2,6 +2,10 @@ from bkstring.bktree import BkTree
 
 class BkGraph():
     def __init__(self, fn='l_dist'):
+        if fn == 'hex_ham_dist':
+            # TODO: Implement hex_ham_dist into BkGraph, needs a way to measure 'len()'
+            raise NotImplementedError('\'hex_ham_dist\' has not been implemented in Bk Graph.')
+
         self.fn = fn
         self.trees = dict()
 
@@ -50,3 +54,10 @@ class BkGraph():
             second = min(length, key)
 
             return min(100 - int(100 * (second - dist) / (first + dist)), 100)
+
+        if self.fn == 'jaro_dist':
+            first = max(length, key)
+            second = min(length, key)
+            return dist + dist / 3 * (second / first)
+
+        return dist

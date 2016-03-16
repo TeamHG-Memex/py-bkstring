@@ -39,6 +39,7 @@ Unfortunately for the time being, distance functions are limited to those implem
 * Levenshtein Distance: Edit distance based on replacements, deletions and insertions
 * Modified Jaccard Distance: This matches character intersection and union sets based on the character, and number of times it occurs.  For example, the modified union of "johndoe" and "jdoe" would be "johndoe," while the unmodified union would be "johnde."
 * Hex Hamming Distance: This checks the hamming distance of two hex strings, using XOR of binary values of the characters at each position in the strings.  Expects strings to be any length and contain only characters which represent valid hex values.  This includes '0-9', 'a-f', and 'A-F' characters.
+* Jaro Distance: Edit distance based on limited positional difference in character matches.  Returns a value which is based on a coefficient multiplied by 100.
 
 ### Setting the distance function on the BK Tree
 
@@ -55,6 +56,8 @@ b = BkTree(fn='mod_j_dist')
 # Invalid example string would be 'cv67zx890ewrq890h' or 'VDSUH9F8.=FJ4V89N-J'
 b = BkTree(fn='hex_ham_dist')
 
+# Jaro Distance:
+b = BkTree(fn='jaro_dist')
 ```
 *If "fn" is set to any other string, it will default to Levenshtein Distance.*
 
