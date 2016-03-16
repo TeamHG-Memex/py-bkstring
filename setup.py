@@ -8,4 +8,4 @@ setup(name = 'bkstring',
     url = 'github.com/bcmackintosh/py-bkstring',
     packages = ['bkstring'],
     package_dir = {'bkstring': 'lib'},
-    package_data = {'bkstring': ['shared/libbkstring.so', 'model/default_namesplitter']})
+    package_data = {'bkstring': ['shared/libbkstring.so']})
